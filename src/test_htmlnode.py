@@ -99,6 +99,14 @@ class ParentNodeTest(unittest.TestCase):
             node3.to_html(),
         )
 
+    def test_tohtml_nochildren(self):
+        node = ParentNode(tag="div", children=None)
+        self.assertRaises(ValueError, node.to_html)
+
+    def test_tohtml_notag(self):
+        node = ParentNode(tag=None, children=[LeafNode("Bold text", "b")])
+        self.assertRaises(ValueError, node.to_html)
+
 
 if __name__ == "__main__":
     unittest.main()
