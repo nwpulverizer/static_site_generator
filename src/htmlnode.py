@@ -1,5 +1,14 @@
+from typing import Optional, Union, List, ForwardRef
+
+
 class HTMLNode:
-    def __init__(self, tag=None, value=None, children=None, props=None) -> None:
+    def __init__(
+        self,
+        tag: Optional[str] = None,
+        value: Optional[str] = None,
+        children: Optional[list] = None,
+        props: Optional[dict] = None,
+    ) -> None:
         self.tag = tag
         self.value = value
         self.children = children
@@ -21,7 +30,7 @@ class HTMLNode:
 
 
 class LeafNode(HTMLNode):
-    def __init__(self, value, tag, props=None):
+    def __init__(self, value: str, tag: Union[str, None], props: Optional[dict] = None):
         super().__init__(tag=tag, value=value, props=props)
 
     def to_html(self):
@@ -33,8 +42,18 @@ class LeafNode(HTMLNode):
             return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
 
+ParentNode = ForwardRef(
+    "ParentNode",
+)
+
+
 class ParentNode(HTMLNode):
-    def __init__(self, children, tag=None, props=None):
+    def __init__(
+        self,
+        children: List[Union[LeafNode, ParentNode]],
+        tag: Optional[str] = None,
+        props: Optional[dict] = None,
+    ):
         super().__init__(tag=tag, children=children, props=props)
 
     def to_html(self):
