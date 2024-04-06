@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType
+from textnode import TextNode, TextType, split_nodes_delimiter
 
 
 class TextNodeTest(unittest.TestCase):
@@ -27,7 +27,7 @@ class TextNodeTest(unittest.TestCase):
     def test_repr(self):
         node = TextNode("This is a text node", TextType.bold, "http://url.com")
         self.assertEqual(
-            "TextNode(This is a text node, bold, http://url.com)", repr(node)
+            "TextNode(This is a text node, TextType.bold, http://url.com)", repr(node)
         )
 
 

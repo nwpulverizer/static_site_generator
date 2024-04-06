@@ -1,33 +1,6 @@
-from typing import Optional, List
-from enum import Enum
-
-
-class TextType(Enum):
-    text = 1
-    bold = 2
-    italic = 3
-    code = 4
-    link = 5
-    image = 6
-
-
-class TextNode:
-    def __init__(
-        self, TEXT: str, TEXT_TYPE: TextType, URL: Optional[str] = None
-    ) -> None:
-        self.text = TEXT
-        self.text_type = TEXT_TYPE
-        self.url = URL
-
-    def __eq__(self, other) -> bool:
-        return (
-            self.text == other.text
-            and self.text_type == other.text_type
-            and self.url == other.url
-        )
-
-    def __repr__(self):
-        return f"TextNode({self.text}, {self.text_type}, {self.url})"
+from typing import List
+from textnode import TextNode, TextType
+import re
 
 
 def split_nodes_delimiter(
@@ -54,3 +27,12 @@ def split_nodes_delimiter(
             if item.text_type == TextType.text and item.text == "":
                 new_nodes.remove(item)
         return new_nodes
+
+
+def extract_markdown_images(text: str):
+    results = re.findall(r"!\[(.*?)\]\((.*?)\)", text)
+    return results
+
+
+def extract_markdown_links(text: str):
+    return re.findall(r"\[(.*?)\]\((.*?)\)", text)
