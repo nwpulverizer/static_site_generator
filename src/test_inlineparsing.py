@@ -5,6 +5,7 @@ from inline_markdown import (
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
+    split_nodes_images,
 )
 
 
@@ -89,6 +90,60 @@ class InlineParseTest(unittest.TestCase):
         text = "This is text without images"
         extracted_links = extract_markdown_images(text)
         self.assertEqual(extracted_links, [])
+
+    def test_split_nodes_images_single_image(self):
+        text = TextNode(
+            "Here is text with an image ![image](https://image.com).", TextType.text
+        )
+        result = split_nodes_images([text])
+        expected_result = [
+            TextNode("Here is text with an image ", TextType.text),
+            TextNode("image", TextType.image, "https://image.com"),
+            TextNode(".", TextType.text),
+        ]
+        self.assertEqual(result, expected_result)
+
+    def test_split_nodes_images_multiple_images(self):
+        text = TextNode(
+            "Here is text with an image ![image](https://image.com). Why not another one? ![image2](https://image2.url)",
+            TextType.text,
+        )
+        result = split_nodes_images([text])
+        expected_result = [
+            TextNode("Here is text with an image ", TextType.text),
+            TextNode("image", TextType.image, "https://image.com"),
+            TextNode(". Why not another one? ", TextType.text),
+            TextNode("image2", TextType.image, URL="https://image2.url"),
+        ]
+        self.assertEqual(result, expected_result)
+
+    def test_split_nodes_images_justimage(self):
+        text = TextNode("![image](onlyimage.com)", TextType.text)
+        result = split_nodes_images([text])
+        expected_result = [TextNode("image", TextType.image, "onlyimage.com")]
+        self.assertEqual(result, expected_result)
+
+    def test_split_nodes_images_2itemlist(self):
+        text = TextNode(
+            "Here is text with an image ![image](https://image.com). Why not another one? ![image2](https://image2.url)",
+            TextType.text,
+        )
+        text2 = TextNode(
+            "Here is text with an image again ![image3](https://image3.com). Why not another one? ![image4](https://image4.url)",
+            TextType.text,
+        )
+        result = split_nodes_images([text, text2])
+        expected_result = [
+            TextNode("Here is text with an image ", TextType.text),
+            TextNode("image", TextType.image, "https://image.com"),
+            TextNode(". Why not another one? ", TextType.text),
+            TextNode("image2", TextType.image, URL="https://image2.url"),
+            TextNode("Here is text with an image again ", TextType.text),
+            TextNode("image3", TextType.image, "https://image3.com"),
+            TextNode(". Why not another one? ", TextType.text),
+            TextNode("image4", TextType.image, URL="https://image4.url"),
+        ]
+        self.assertEqual(result, expected_result)
 
 
 if __name__ == "__main__":
