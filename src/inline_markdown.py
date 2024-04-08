@@ -61,3 +61,28 @@ def split_nodes_images(old_nodes: List[TextNode]):
                     new_nodes.remove(node)
             print(new_nodes)
     return new_nodes
+
+
+def split_nodes_links(old_nodes: List[TextNode]):
+    new_nodes = []
+    for node in old_nodes:
+        extracted_links = extract_markdown_links(node.text)
+        if extracted_links == []:
+            new_nodes.append(node)
+        else:
+            count = 0
+            while count < len(extracted_links):
+                linktup = extracted_links[count]
+                split_string = f"![{linktup[0]}]({linktup[1]})"
+                new_text_nodes = node.text.split(split_string, 1)
+                firstitem = TextNode(new_text_nodes[0], TextType.text)
+                node = TextNode(new_text_nodes[1], TextType.text)
+                link_node = TextNode(linktup[0], TextType.link, linktup[1])
+                new_nodes.extend([firstitem, link_node])
+                count += 1
+            new_nodes.append(node)
+            for node in new_nodes:
+                if node.text == "":
+                    new_nodes.remove(node)
+            print(new_nodes)
+    return new_nodes
