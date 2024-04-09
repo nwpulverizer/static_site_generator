@@ -6,6 +6,8 @@ from inline_markdown import (
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_images,
+    split_nodes_links,
+    string_to_TextNode,
 )
 
 
@@ -144,6 +146,97 @@ class InlineParseTest(unittest.TestCase):
             TextNode("image4", TextType.image, URL="https://image4.url"),
         ]
         self.assertEqual(result, expected_result)
+
+    def test_split_nodes_links_single_link(self):
+        text = TextNode("Here is text with a [link](https://image.com).", TextType.text)
+        result = split_nodes_links([text])
+        expected_result = [
+            TextNode("Here is text with a ", TextType.text),
+            TextNode("link", TextType.link, "https://image.com"),
+            TextNode(".", TextType.text),
+        ]
+        self.assertEqual(result, expected_result)
+
+    def test_split_nodes_links_two_item_list(self):
+        text = TextNode(
+            "Here is text with a [link](https://image.com). Why not another one? [link2](https://image2.url)",
+            TextType.text,
+        )
+        text2 = TextNode(
+            "Here is text with a link again! [link3](https://image3.com). Why not another one? [link4](https://image4.url)",
+            TextType.text,
+        )
+        result = split_nodes_links([text, text2])
+        expected_result = [
+            TextNode("Here is text with a ", TextType.text),
+            TextNode("link", TextType.link, "https://image.com"),
+            TextNode(". Why not another one? ", TextType.text),
+            TextNode("link2", TextType.link, URL="https://image2.url"),
+            TextNode("Here is text with a link again! ", TextType.text),
+            TextNode("link3", TextType.link, "https://image3.com"),
+            TextNode(". Why not another one? ", TextType.text),
+            TextNode("link4", TextType.link, URL="https://image4.url"),
+        ]
+        self.assertEqual(result, expected_result)
+
+    def test_string_to_text_nodes(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+        expected_result = [
+            TextNode("This is ", TextType.text),
+            TextNode("text", TextType.bold),
+            TextNode(" with an ", TextType.text),
+            TextNode("italic", TextType.italic),
+            TextNode(" word and a ", TextType.text),
+            TextNode("code block", TextType.code),
+            TextNode(" and an ", TextType.text),
+            TextNode(
+                "image",
+                TextType.image,
+                "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+            ),
+            TextNode(" and a ", TextType.text),
+            TextNode("link", TextType.link, "https://boot.dev"),
+        ]
+        self.assertEqual(expected_result, string_to_TextNode(text))
+
+    def test_string_to_text_nodes_onlytext(self):
+        text = "This is just text."
+        expected_result = [TextNode("This is just text.", TextType.text)]
+        self.assertEqual(expected_result, string_to_TextNode(text))
+
+    def test_string_to_text_nodes_onlyimage(self):
+        text = "![alt](image.jpg)"
+        expected_result = [TextNode("alt", TextType.image, "image.jpg")]
+        self.assertEqual(expected_result, string_to_TextNode(text))
+
+    def test_string_to_text_nodes_onlylink(self):
+        text = "[link](funlink.com)"
+        expected_result = [TextNode("link", TextType.link, "funlink.com")]
+        self.assertEqual(expected_result, string_to_TextNode(text))
+
+    def test_string_to_text_nodes_onlycode(self):
+        text = "`h = 2`"
+        expected_result = [TextNode("h = 2", TextType.code)]
+        self.assertEqual(expected_result, string_to_TextNode(text))
+
+    def test_string_to_text_nodes_onlybold(self):
+        text = "**bold**"
+        expected_result = [TextNode("bold", TextType.bold)]
+        self.assertEqual(expected_result, string_to_TextNode(text))
+
+    def test_string_to_text_nodes_onlyitalic(self):
+        text = "*italic*"
+        expected_result = [TextNode("italic", TextType.italic)]
+        self.assertEqual(expected_result, string_to_TextNode(text))
+
+    def test_string_to_text_nodes_bold_italic(self):
+        text = "*italic text* and **bold**"
+        expected_result = [
+            TextNode("italic text", TextType.italic),
+            TextNode(" and ", TextType.text),
+            TextNode("bold", TextType.bold),
+        ]
+        self.assertEqual(expected_result, string_to_TextNode(text))
 
 
 if __name__ == "__main__":
