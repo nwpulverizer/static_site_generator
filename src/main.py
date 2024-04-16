@@ -1,7 +1,8 @@
 import os
 import shutil
+import argparse
 from pathlib import Path
-from generatepage import generate_pages_recursive 
+from generatepage import generate_pages_recursive
 
 
 def copy_dir_r(src: Path, dest: Path):
@@ -19,7 +20,17 @@ def copy_dir_r(src: Path, dest: Path):
 
 
 def main():
-    ssg_path = Path("/home/nathan/Documents/boot.dev/static_site_generator")
+    parser = argparse.ArgumentParser(
+        prog="Static site generator",
+        description="Generate static site from content",
+        epilog="Not meant for prod. This is a learning project.",
+    )
+    parser.add_argument(
+        "ssg_path",
+        help="The path to your static site. Expects the folder to contain static/ and content/",
+    )
+    args = parser.parse_args()
+    ssg_path = Path(args.ssg_path)
     static_path = ssg_path / "static/"
     public_path = ssg_path / "public/"
     if public_path.exists():
