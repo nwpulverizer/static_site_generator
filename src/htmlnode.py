@@ -33,7 +33,7 @@ class LeafNode(HTMLNode):
     def __init__(self, value: str, tag: Union[str, None], props: Optional[dict] = None):
         super().__init__(tag=tag, value=value, props=props)
 
-    def to_html(self):
+    def to_html(self) -> str:
         if self.value is None:
             raise ValueError
         if self.tag is None:
@@ -56,7 +56,11 @@ class ParentNode(HTMLNode):
     ):
         super().__init__(tag=tag, children=children, props=props)
 
-    def to_html(self):
+    def to_html(self) -> str:
+        """
+        Reads in the tag attribute and outputs a string of html
+        for that tag. Calls on children as well.
+        """
         if self.tag is None:
             raise ValueError("Parent requires a tag")
         if self.children is None:

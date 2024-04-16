@@ -1,5 +1,5 @@
 import re
-from typing import List
+from typing import List, Tuple
 
 from textnode import TextNode, TextType
 
@@ -30,12 +30,12 @@ def split_nodes_delimiter(
     return new_nodes
 
 
-def extract_markdown_images(text: str):
+def extract_markdown_images(text: str) -> List[Tuple[str, str]]:
     results = re.findall(r"!\[(.*?)\]\((.*?)\)", text)
     return results
 
 
-def extract_markdown_links(text: str):
+def extract_markdown_links(text: str) -> List[Tuple[str, str]]:
     return re.findall(r"\[(.*?)\]\((.*?)\)", text)
 
 
@@ -88,12 +88,14 @@ def split_nodes_links(old_nodes: List[TextNode]) -> List[TextNode]:
     return new_nodes
 
 
-def string_to_TextNode(linestring: str):
+def string_to_TextNode(linestring: str) -> List[TextNode]:
     firstnode = TextNode(linestring, TextType.text)
     nodes = [firstnode]
     nodes = split_nodes_images(nodes)
     nodes = split_nodes_links(nodes)
     nodes = split_nodes_delimiter(nodes, "`", TextType.code)
     nodes = split_nodes_delimiter(nodes, "**", TextType.bold)
+    nodes = split_nodes_delimiter(nodes, "__", TextType.bold)
     nodes = split_nodes_delimiter(nodes, "*", TextType.italic)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.italic)
     return nodes

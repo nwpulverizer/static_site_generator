@@ -1,5 +1,7 @@
 from enum import Enum
+from typing import List
 import re
+from htmlnode import ParentNode, LeafNode
 
 
 class BlockType(Enum):
@@ -13,7 +15,7 @@ class BlockType(Enum):
 
 # define block as something split by a single blank line.
 # True for well behaved md.
-def markdown_to_blocks(markdown: str):
+def markdown_to_blocks(markdown: str) -> List[str]:
     # remove empty new lines from start and end
     markdown = markdown.strip("\n")
     # split on new lines
@@ -25,7 +27,7 @@ def markdown_to_blocks(markdown: str):
     return non_empty
 
 
-def block_to_block_type(block: str):
+def block_to_block_type(block: str) -> BlockType:
     # if you want to consider something a heading even without any text,
     # remove the .* part of the pattern
     if re.match(r"^#{1,6}\s.*", block):
